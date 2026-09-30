@@ -1,9 +1,11 @@
 // YouTube Data API v3. We poll each whitelisted channel's uploads playlist (1 quota unit per call)
-// instead of search.list (100 units). Channel IDs: fill in after mapping (see CLAUDE.md).
+// instead of search.list (100 units). Videos from these channels are auto-approved on ingest.
 export const CHANNEL_WHITELIST: { id: string; name: string }[] = [
-  // { id: "UC...", name: "NBA" },
-  // { id: "UC...", name: "Portland Trail Blazers" },
-  // { id: "UC...", name: "ספורט 5" },
+  { id: "UCWJ2lWNubArHWmf3FIHbfcQ", name: "NBA" },
+  { id: "UCXk66yyzXo7-2M1BMqLhltQ", name: "Portland Trail Blazers" },
+  { id: "UCyXf5cz6E9IIL40aivg7tOw", name: "ספורט 5" },
+  { id: "UCJuHDy_gH7Qc6cn29wlRlJw", name: "איגוד הכדורסל" },
+  { id: "UC9-OpMMVoNP5o10_Iyq7Ndw", name: "Bleacher Report" },
 ];
 
 export interface YtUpload { youtubeId: string; channelId: string; channelTitle: string; title: string; description: string; publishedAt: string; thumbnail: string | null; }

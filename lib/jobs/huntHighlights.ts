@@ -23,7 +23,7 @@ export async function huntHighlights() {
       await db.from("videos").insert({
         player_id: p.id, youtube_id: u.youtubeId, channel_id: u.channelId, channel_title: u.channelTitle,
         title: u.title, published_at: u.publishedAt, thumbnail_url: u.thumbnail,
-        game_id: game?.id ?? null, season: game?.season ?? null, move_types: cls.move_types, approved: false,
+        game_id: game?.id ?? null, season: game?.season ?? null, move_types: cls.move_types, approved: true,
       });
       added++;
     }
