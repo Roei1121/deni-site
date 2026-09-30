@@ -1,0 +1,25 @@
+{
+  "name": "deni-hub",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "fast-xml-parser": "^5.11.2",
+    "next": "^16.3.7",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5.5.0"
+  }
+}
