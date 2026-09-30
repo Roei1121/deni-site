@@ -1,6 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = () => new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = () => new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  ...(process.env.ANTHROPIC_WORKSPACE_ID
+    ? { defaultHeaders: { "anthropic-workspace-id": process.env.ANTHROPIC_WORKSPACE_ID } }
+    : {}),
+});
 export const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
 
 /** Ask for JSON only, strip stray fences, parse. */
