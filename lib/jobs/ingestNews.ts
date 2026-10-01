@@ -12,15 +12,19 @@ export async function ingestNews() {
   for (const feed of FEEDS) {
     const items = (await readFeed(feed)).slice(0, 30);
     for (const it of items) {
-      const { data: exists } = await db.from("articles").select("id").eq("url", it.url).maybeSingle();
-      if (exists) continue;
-      const a = await askJson<{ summary_he: string; topic: string; about_deni: boolean }>(ARTICLE_SYSTEM, `${it.source}: ${it.title}`, 300);
-      if (!a.about_deni) continue;
-      await db.from("articles").insert({
-        player_id: p.id, url: it.url, source: it.source, lang: it.lang, country: it.country,
-        title: it.title, summary_he: a.summary_he, topic: a.topic, published_at: it.publishedAt,
-      });
-      added++;
+      try {
+        const { data: exists } = await db.from("articles").select("id").eq("url", it.url).maybeSingle();
+        if (exists) continue;
+        const a = await askJson<{ summary_he: string; topic: string; about_deni: boolean }>(ARTICLE_SYSTEM, `${it.source}: ${it.title}`, 300);
+        if (!a.about_deni) continue;
+        await db.from("articles").insert({
+          player_id: p.id, url: it.url, source: it.source, lang: it.lang, country: it.country,
+          title: it.title, summary_he: a.summary_he, topic: a.topic, published_at: it.publishedAt,
+        });
+        added++;
+      } catch (e) {
+        console.error(`ingest-news: skipping "${it.title}":`, e instanceof Error ? e.message : e);
+      }
     }
   }
   return { added };

@@ -2,10 +2,7 @@ name: Cron Jobs
 
 on:
   schedule:
-    - cron: "*/10 * * * *"  # close-games
     - cron: "*/15 * * * *"  # hunt-highlights
-    - cron: "*/20 * * * *"  # ingest-news
-    - cron: "0 9 * * *"     # sync-schedule
   workflow_dispatch:
     inputs:
       job:
@@ -13,44 +10,13 @@ on:
         required: true
         type: choice
         options:
-          - close-games
           - hunt-highlights
-          - ingest-news
-          - sync-schedule
 
 jobs:
-  close-games:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'close-games' || github.event_name == 'schedule' && github.event.schedule == '*/10 * * * *'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger close-games
-        run: |
-          curl -fsS -X GET "${{ secrets.SITE_URL }}/api/cron/close-games" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
-
   hunt-highlights:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'hunt-highlights' || github.event_name == 'schedule' && github.event.schedule == '*/15 * * * *'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger hunt-highlights
         run: |
           curl -fsS -X GET "${{ secrets.SITE_URL }}/api/cron/hunt-highlights" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
-
-  ingest-news:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'ingest-news' || github.event_name == 'schedule' && github.event.schedule == '*/20 * * * *'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger ingest-news
-        run: |
-          curl -fsS -X GET "${{ secrets.SITE_URL }}/api/cron/ingest-news" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
-
-  sync-schedule:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'sync-schedule' || github.event_name == 'schedule' && github.event.schedule == '0 9 * * *'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger sync-schedule
-        run: |
-          curl -fsS -X GET "${{ secrets.SITE_URL }}/api/cron/sync-schedule" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

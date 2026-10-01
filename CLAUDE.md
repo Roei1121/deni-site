@@ -13,7 +13,7 @@ No Supabase env → site runs on demo data from `lib/mock.ts` (banner shown).
 - `lib/data.ts` — read layer for pages (Supabase or mock).
 - `lib/providers/` — `stats.ts` contract, `balldontlie.ts` adapter, `youtube.ts`, `news.ts` (RSS).
 - `lib/jobs/` — `syncSchedule`, `closeGames` (box score → records → recap), `huntHighlights`, `ingestNews`; `log.ts` writes job_runs.
-- `app/api/cron/[job]` — Vercel Cron entry, guarded by `CRON_SECRET`. Schedules in `vercel.json` (UTC).
+- `app/api/cron/[job]` — cron entry point, guarded by `CRON_SECRET`. `hunt-highlights` runs via GitHub Actions (`.github/workflows/cron.yml`); `close-games`, `ingest-news`, `sync-schedule` run via cron-job.org.
 - `lib/ai/prompts.ts` — Hebrew prompts + fixed glossary. Model writes words only; numbers come from DB.
 - `lib/records.ts` — deterministic season/career-high detection.
 
@@ -36,11 +36,14 @@ Done (2026-09-30):
 - `ingest-news` running: 52 articles with Hebrew summaries from Google News RSS (IL + US).
 - 5 draft `game_recaps` generated for last 5 games of 2025-26; prompt fixed to include team name.
 - `ANTHROPIC_MODEL=claude-sonnet-4-6` set in `.env.local` (default in code was wrong model name).
+Done (2026-10-01):
+- Deployed to Vercel (https://deni-site-delta.vercel.app); GitHub repo: Roei1121/deni-site.
+- `CHANNEL_WHITELIST` filled with 5 verified channel IDs (NBA, Trail Blazers, ספורט 5, איגוד הכדורסל, Bleacher Report); videos auto-approved on ingest.
+- `close-games`, `ingest-news`, `sync-schedule` moved to cron-job.org; `hunt-highlights` stays on GitHub Actions.
+- `askJson` hardened: prefill `{` forces JSON output; retries once on SyntaxError; each article wrapped in try/catch.
 
 ## Next (in order)
-1. Deploy to Vercel: set all `.env.local` vars as Vercel env vars, verify cron triggers.
-2. Fill `CHANNEL_WHITELIST` in `lib/providers/youtube.ts` (channel IDs for NBA, Trail Blazers, ספורט 5, איגוד הכדורסל).
-3. Add direct publisher RSS feeds to `FEEDS` in `lib/providers/news.ts` (see מקורות tab in Claude Doc).
+1. Add direct publisher RSS feeds to `FEEDS` in `lib/providers/news.ts` (see מקורות tab in Claude Doc).
 4. Admin page (`/admin`, Supabase auth): approve recaps, confirm video↔game + move tags.
 5. Telegram alerts on job failure; then Push + Telegram channel for the 07:00 morning recap.
 6. OG share image per game (`app/games/[slug]/opengraph-image.tsx`).
