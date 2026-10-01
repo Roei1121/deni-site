@@ -8,19 +8,25 @@ const client = () => new Anthropic({
 });
 export const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
 
-/** Ask for JSON only. Prefills `{` so Claude is forced into a JSON object,
- *  strips stray fences, and retries once on parse failure. */
+// Forced tool_use: model must call this tool, so `input` arrives as a parsed
+// object — no JSON.parse, no fence-stripping, no prefill hacks needed.
+const OUTPUT_TOOL: Anthropic.Tool = {
+  name: "output",
+  description: "Return the structured output as described in the system prompt.",
+  input_schema: { type: "object" },
+};
+
 export async function askJson<T>(system: string, user: string, maxTokens = 1200): Promise<T> {
   const run = async (): Promise<T> => {
     const msg = await client().messages.create({
       model: MODEL, max_tokens: maxTokens, system,
-      messages: [
-        { role: "user", content: user },
-        { role: "assistant", content: "{" },
-      ],
+      tools: [OUTPUT_TOOL],
+      tool_choice: { type: "tool", name: "output" },
+      messages: [{ role: "user", content: user }],
     });
-    const raw = msg.content.map((b) => (b.type === "text" ? b.text : "")).join("");
-    return JSON.parse(("{" + raw).replace(/```json|```/g, "").trim()) as T;
+    const block = msg.content.find((b) => b.type === "tool_use");
+    if (!block || block.type !== "tool_use") throw new Error("no tool_use block");
+    return block.input as T;
   };
   try {
     return await run();
